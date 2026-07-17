@@ -329,7 +329,7 @@
       </div>`
           : ""
       }
-      <div class="note">Ground sources: each spawn point first rolls its fill chance, then picks one weighted entry from eligible pools. Containers roll N times per restock. Map shows POI outlines from Z1_POIs.json and spawn points from Z1_items / Z1_lootableProps.</div>
+      <div class="note">Ground sources: each spawn point first rolls its fill chance, then picks one weighted entry from eligible pools. Containers roll N times per restock. Map shows spawn points from Z1_items / Z1_lootableProps.</div>
     </div>`;
   }
 
@@ -346,29 +346,6 @@
   // Map
   // ------------------------------------------------------------------
   const MAP_COLORS = ["#d9a743", "#7fb069", "#6a9fd8", "#c65f5f", "#a883d8", "#5fc6b8", "#d8d86a", "#d86ab8"];
-  const POI_FILL = {
-    high_tier: "rgba(198, 95, 95, 0.18)",
-    military: "rgba(198, 95, 95, 0.22)",
-    residential: "rgba(106, 159, 216, 0.16)",
-    commercial: "rgba(217, 167, 67, 0.14)",
-    rural: "rgba(127, 176, 105, 0.14)",
-    industrial: "rgba(168, 131, 216, 0.16)"
-  };
-  const POI_STROKE = {
-    high_tier: "rgba(198, 95, 95, 0.55)",
-    military: "rgba(198, 95, 95, 0.65)",
-    residential: "rgba(106, 159, 216, 0.5)",
-    commercial: "rgba(217, 167, 67, 0.5)",
-    rural: "rgba(127, 176, 105, 0.5)",
-    industrial: "rgba(168, 131, 216, 0.5)"
-  };
-
-  function poiStyle(tags) {
-    for (const t of ["military", "high_tier", "industrial", "commercial", "residential", "rural"]) {
-      if (tags.includes(t)) return { fill: POI_FILL[t], stroke: POI_STROKE[t] };
-    }
-    return { fill: "rgba(136,145,160,0.12)", stroke: "rgba(136,145,160,0.4)" };
-  }
 
   function drawMap(groups) {
     const canvas = $("#map");
@@ -424,27 +401,6 @@
         for (let row = 0; row < 8; row++) {
           const letter = String.fromCharCode(65 + col);
           ctx.fillText(letter + (row + 1), col * cell + cell / 2, row * cell + cell / 2);
-        }
-      }
-
-      // POI polygons
-      for (const poi of DB.pois || []) {
-        const style = poiStyle(poi.tags || []);
-        for (const poly of poi.bounds || []) {
-          if (poly.length < 6) continue;
-          ctx.beginPath();
-          for (let i = 0; i < poly.length; i += 2) {
-            const nx = ((poly[i] + EXT) / (2 * EXT)) * W;
-            const ny = (1 - (poly[i + 1] + EXT) / (2 * EXT)) * H;
-            if (i === 0) ctx.moveTo(nx, ny);
-            else ctx.lineTo(nx, ny);
-          }
-          ctx.closePath();
-          ctx.fillStyle = style.fill;
-          ctx.fill();
-          ctx.strokeStyle = style.stroke;
-          ctx.lineWidth = 1.5 / scale;
-          ctx.stroke();
         }
       }
       ctx.restore();
