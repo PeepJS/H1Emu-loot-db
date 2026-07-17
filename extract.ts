@@ -683,18 +683,31 @@ function categorize(d: any, id: number): string {
 }
 
 /** Drop placeholder / unused defs. Keeps real items like "Blood Test Kit". */
-function isExcludedItem(name: string): boolean {
+function isExcludedItem(d: { NAME?: string; DESCRIPTION_ID?: number; ITEM_TYPE?: number }): boolean {
+  const name = d.NAME || "";
   if (/do\s*not\s*use/i.test(name)) return true;
-  if (!/\btest\b/i.test(name)) return false;
-  if (/blood\s+test|test\s+tube|test\s+kit/i.test(name)) return false;
-  return true;
+  // Unfinished modular construction stubs (Door.01.Base.Modular, etc.)
+  if (/\.Base\.Modular$/i.test(name)) return true;
+  if (/^Invalid String/i.test(name)) return true;
+  const desc = locale[d.DESCRIPTION_ID ?? -1] || "";
+  if (
+    /^Invalid String/i.test(desc) &&
+    [40, 41].includes(d.ITEM_TYPE ?? -1)
+  ) {
+    return true;
+  }
+  if (/\btest\b/i.test(name)) {
+    if (/blood\s+test|test\s+tube|test\s+kit/i.test(name)) return false;
+    return true;
+  }
+  return false;
 }
 
 const items: any[] = [];
 for (const d of Object.values(itemDefs) as any[]) {
   const id = d.ID;
   if (!id || !d.NAME) continue;
-  if (isExcludedItem(d.NAME)) continue;
+  if (isExcludedItem(d)) continue;
   const codeName = (Items as any)[id];
   const item: any = {
     id,
