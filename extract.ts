@@ -682,10 +682,19 @@ function categorize(d: any, id: number): string {
   return "Other";
 }
 
+/** Drop placeholder / unused defs. Keeps real items like "Blood Test Kit". */
+function isExcludedItem(name: string): boolean {
+  if (/do\s*not\s*use/i.test(name)) return true;
+  if (!/\btest\b/i.test(name)) return false;
+  if (/blood\s+test|test\s+tube|test\s+kit/i.test(name)) return false;
+  return true;
+}
+
 const items: any[] = [];
 for (const d of Object.values(itemDefs) as any[]) {
   const id = d.ID;
   if (!id || !d.NAME) continue;
+  if (isExcludedItem(d.NAME)) continue;
   const codeName = (Items as any)[id];
   const item: any = {
     id,
