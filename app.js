@@ -446,17 +446,6 @@
           ctx.lineWidth = 1.5 / scale;
           ctx.stroke();
         }
-        // label at POI center
-        const lx = ((poi.x + EXT) / (2 * EXT)) * W;
-        const ly = (1 - (poi.z + EXT) / (2 * EXT)) * H;
-        ctx.font = `600 ${12 / scale}px Segoe UI, sans-serif`;
-        ctx.fillStyle = "rgba(214,218,226,0.85)";
-        ctx.strokeStyle = "rgba(0,0,0,0.55)";
-        ctx.lineWidth = 3 / scale;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.strokeText(poi.name, lx, ly);
-        ctx.fillText(poi.name, lx, ly);
       }
       ctx.restore();
 
@@ -620,7 +609,7 @@
     const it = byId.get(id);
     if (!it) { content.innerHTML = `<div class="home"><h1>Item #${id} not found</h1></div>`; return; }
     renderSidebar(it.cat);
-    document.title = it.name + " — Z1 Loot DB";
+    document.title = it.name + " — H1Emu Loot Database";
     const about = kv([
       ["Item ID", it.id],
       ["Class", it.cls ? esc(it.cls) : undefined],
@@ -650,7 +639,7 @@
 
   function catPage(cat) {
     renderSidebar(cat);
-    document.title = cat + " — Z1 Loot DB";
+    document.title = cat + " — H1Emu Loot Database";
     const list = DB.items
       .filter((i) => i.cat === cat)
       .sort((a, b) => (!!b.sources - !!a.sources) || a.name.localeCompare(b.name));
@@ -669,7 +658,7 @@
 
   function homePage() {
     renderSidebar(null);
-    document.title = "Z1 Loot Database";
+    document.title = "H1Emu Loot Database";
     const lootable = DB.items.filter((i) => i.sources).length;
     const craftable = DB.items.filter((i) => i.craftedBy).length;
     const guns = DB.items.filter((i) => i.weapon).length;
@@ -677,7 +666,7 @@
       .map((id) => byId.get(id))
       .filter(Boolean);
     content.innerHTML = `<div class="home">
-      <h1>Z1 Loot Database</h1>
+      <h1>H1Emu Loot Database</h1>
       <p class="desc">Searchable item database generated straight from the h1z1-server code and data files — damage, fire rates, loot tables, world spawn points, recipes and repair info reflect exactly what the server does.</p>
       <div class="statrow">
         <div class="stat"><div class="big">${DB.meta.itemCount}</div><div class="lbl">items</div></div>

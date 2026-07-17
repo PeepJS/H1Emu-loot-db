@@ -23,7 +23,10 @@ a:hover { text-decoration: underline; }
   padding: 10px 18px;
   background: var(--bg2); border-bottom: 2px solid var(--accent);
 }
-.brand { font-size: 1.25rem; font-weight: 700; letter-spacing: 2px; color: var(--text); white-space: nowrap; }
+.brand {
+  font-size: 1.05rem; font-weight: 700; letter-spacing: 1px;
+  color: var(--text); white-space: nowrap; margin-left: auto;
+}
 .brand span { color: var(--accent); }
 .brand:hover { text-decoration: none; }
 .searchwrap { position: relative; flex: 1; max-width: 560px; }
