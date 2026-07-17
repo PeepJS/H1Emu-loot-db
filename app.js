@@ -19,7 +19,7 @@
     );
 
   $("#meta").textContent =
-    DB.meta.itemCount + " items Â· generated " +
+    DB.meta.itemCount + " items · generated " +
     new Date(DB.meta.generatedAt).toLocaleDateString();
 
   // ------------------------------------------------------------------
@@ -67,7 +67,7 @@
       .map(
         (it, i) =>
           `<div class="row${i === activeIdx ? " active" : ""}" data-id="${it.id}">
-            <span><span class="nm">${esc(it.name)}</span><span class="cd">#${it.id}${it.code ? " Â· " + esc(it.code) : ""}</span></span>
+            <span><span class="nm">${esc(it.name)}</span><span class="cd">#${it.id}${it.code ? " · " + esc(it.code) : ""}</span></span>
             <span class="badge ${esc(it.cat.split(" ")[0])}">${esc(it.cat)}</span>
           </div>`
       )
@@ -132,7 +132,7 @@
       .filter((p) => p[1] !== undefined && p[1] !== null && p[1] !== "")
       .map((p) => `<span class="k">${p[0]}</span><span class="v">${p[1]}</span>`)
       .join("")}</div>`;
-  const fmtCount = (c) => (c[0] === c[1] ? `${c[0]}` : `${c[0]}â€“${c[1]}`);
+  const fmtCount = (c) => (c[0] === c[1] ? `${c[0]}` : `${c[0]}–${c[1]}`);
   const fmtMs = (ms) => (ms >= 1000 ? (ms / 1000).toFixed(1) + "s" : ms + "ms");
 
   function damageText(w) {
@@ -142,13 +142,13 @@
       const hs = d * w.headshotMultiplier;
       return kv([
         ["Body damage", `${d} <small>(${Math.ceil(HP / d)} shots to kill)</small>`],
-        ["Headshot", `${hs} <small>(Ã—${w.headshotMultiplier}, ${Math.ceil(HP / hs)} to kill)</small>`]
+        ["Headshot", `${hs} <small>(×${w.headshotMultiplier}, ${Math.ceil(HP / hs)} to kill)</small>`]
       ]);
     }
     const hsMax = w.damage.max * w.headshotMultiplier;
     return kv([
-      ["Damage (falloff)", `${w.damage.max} â†’ ${w.damage.min} <small>from ${w.damage.startM}m to ${w.damage.endM}m</small>`],
-      ["Headshot", `up to ${hsMax} <small>(Ã—${w.headshotMultiplier})</small>`]
+      ["Damage (falloff)", `${w.damage.max} → ${w.damage.min} <small>from ${w.damage.startM}m to ${w.damage.endM}m</small>`],
+      ["Headshot", `up to ${hsMax} <small>(×${w.headshotMultiplier})</small>`]
     ]);
   }
 
@@ -159,14 +159,14 @@
     const rows = w.modes
       .map(
         (fm) =>
-          `<tr><td>${fm.rpm} RPM</td><td>${fmtMs(fm.reloadMs)}</td><td>${fm.range}m</td><td>${fm.pellets || "â€”"}</td></tr>`
+          `<tr><td>${fm.rpm} RPM</td><td>${fmtMs(fm.reloadMs)}</td><td>${fm.range}m</td><td>${fm.pellets || "—"}</td></tr>`
       )
       .join("");
     const dps =
       it.weapon.damage.kind === "flat"
         ? Math.round((w.damage.value * m.rpm) / 60)
         : null;
-    return `<div class="card"><h2>Weapon â€” ${esc(w.defName || "")}</h2>
+    return `<div class="card"><h2>Weapon — ${esc(w.defName || "")}</h2>
       ${damageText(w)}
       <div style="height:10px"></div>
       ${kv([
@@ -188,9 +188,9 @@
     return `<div class="card"><h2>Melee</h2>
       ${kv([
         ["Damage / swing", `${d} <small>(${Math.ceil(HP / d)} hits to kill)</small>`],
-        ["Headshot", `${d * it.melee.headshotMultiplier} <small>(Ã—${it.melee.headshotMultiplier})</small>`]
+        ["Headshot", `${d * it.melee.headshotMultiplier} <small>(×${it.melee.headshotMultiplier})</small>`]
       ])}
-      <div class="note">Base melee 1000 Ã— weapon multiplier (abilitiesmanager.ts).</div>
+      <div class="note">Base melee 1000 × weapon multiplier (abilitiesmanager.ts).</div>
     </div>`;
   }
 
@@ -201,7 +201,7 @@
         ["Health", u.heal], ["Bandaging", u.bandaging]
       ].filter((e) => e[1]);
       return `<div class="recipe">
-        <div class="rhead">${esc(u.type.replace(/_/g, " "))}${u.timeout ? " Â· " + fmtMs(u.timeout) : ""}${u.healType ? " Â· " + esc(u.healType) : ""}</div>
+        <div class="rhead">${esc(u.type.replace(/_/g, " "))}${u.timeout ? " · " + fmtMs(u.timeout) : ""}${u.healType ? " · " + esc(u.healType) : ""}</div>
         ${kv(effects.map((e) => [e[0], "+" + e[1]]))}
         ${u.givetrash ? `<div class="cond" style="margin-top:6px">Leaves behind: ${link(u.givetrash)}</div>` : ""}
       </div>`;
@@ -216,8 +216,8 @@
       r.kind === "smelt" ? (r.filter === "COOKING" ? "Campfire / BBQ" : "Furnace") : null
     ].filter(Boolean);
     return `<div class="recipe">
-      <div class="rhead">${r.kind === "smelt" ? "Cook / smelt" : "Craft"}${r.bundle ? ` Ã—${r.bundle}` : ""} â€” filter: ${esc(r.filter)}${req.length ? " Â· requires " + req.join(" + ") : ""}</div>
-      <ul>${r.components.map((c) => `<li>${c.amount}Ã— ${link(c.id)}</li>`).join("")}</ul>
+      <div class="rhead">${r.kind === "smelt" ? "Cook / smelt" : "Craft"}${r.bundle ? ` ×${r.bundle}` : ""} — filter: ${esc(r.filter)}${req.length ? " · requires " + req.join(" + ") : ""}</div>
+      <ul>${r.components.map((c) => `<li>${c.amount}× ${link(c.id)}</li>`).join("")}</ul>
       ${r.leftOver ? `<div class="cond">Left over: ${r.leftOver.map(link).join(", ")}</div>` : ""}
     </div>`;
   }
@@ -252,10 +252,10 @@
       main += ` <span class="cond">of pool</span>`;
     } else if (s.rolls) {
       main += ` <span class="cond">per roll</span>`;
-      extra.push(`${s.rolls[0]}â€“${s.rolls[1]} rolls`);
+      extra.push(`${s.rolls[0]}–${s.rolls[1]} rolls`);
     }
-    if (s.via) extra.push("via " + s.via.join(" â†’ "));
-    return main + (extra.length ? `<div class="cond">${extra.join(" Â· ")}</div>` : "");
+    if (s.via) extra.push("via " + s.via.join(" → "));
+    return main + (extra.length ? `<div class="cond">${extra.join(" · ")}</div>` : "");
   }
 
   function sourceName(s) {
@@ -277,7 +277,7 @@
           <td>${sourceName(s)}</td>
           <td>${chanceText(s)}</td>
           <td>${fmtCount(s.count)}</td>
-          <td class="cond">${(s.conditions || []).join("; ") || "â€”"}</td>
+          <td class="cond">${(s.conditions || []).join("; ") || "—"}</td>
         </tr>`
       )
       .join("");
@@ -302,11 +302,10 @@
   // Pages
   // ------------------------------------------------------------------
   function itemPage(id) {
-
     const it = byId.get(id);
     if (!it) { content.innerHTML = `<div class="home"><h1>Item #${id} not found</h1></div>`; return; }
     renderSidebar(it.cat);
-    document.title = it.name + " â€” H1Emu Loot Database";
+    document.title = it.name + " — H1Emu Loot Database";
     const about = kv([
       ["Item ID", it.id],
       ["Class", it.cls ? esc(it.cls) : undefined],
@@ -336,7 +335,7 @@
 
   function catPage(cat) {
     renderSidebar(cat);
-    document.title = cat + " â€” H1Emu Loot Database";
+    document.title = cat + " — H1Emu Loot Database";
     const list = DB.items
       .filter((i) => i.cat === cat)
       .sort((a, b) => (!!b.sources - !!a.sources) || a.name.localeCompare(b.name));
@@ -346,7 +345,7 @@
           (i) =>
             `<a class="itemcard" href="#/item/${i.id}">
               <div class="nm">${esc(i.name)}</div>
-              <div class="sub">#${i.id}${i.sources ? ` Â· ${i.sources.length} loot source${i.sources.length > 1 ? "s" : ""}` : ""}${i.craftedBy ? " Â· craftable" : ""}</div>
+              <div class="sub">#${i.id}${i.sources ? ` · ${i.sources.length} loot source${i.sources.length > 1 ? "s" : ""}` : ""}${i.craftedBy ? " · craftable" : ""}</div>
             </a>`
         )
         .join("")}</div>`;
@@ -402,11 +401,11 @@
 
   const PRESETS = [
     {
-      name: "1Ã—1 starter deck",
+      name: "1×1 starter deck",
       qty: { 1378: 1, 149: 3, 1969: 1, 1881: 1, 150: 1 }
     },
     {
-      name: "2Ã—2 metal base",
+      name: "2×2 metal base",
       qty: {
         1378: 1,
         2336: 4,
@@ -443,7 +442,7 @@
 
   function builderPage() {
     renderSidebar("__builder");
-    document.title = "Building Calculator â€” H1Emu Loot Database";
+    document.title = "Building Calculator — H1Emu Loot Database";
     const groups = builderPieces();
     const qty = {};
 
@@ -481,7 +480,7 @@
           <p class="builder-empty">Add structures to see totals.</p>
         </aside>
       </div>
-      <p class="builder-footnote">Raw estimate uses component recipes: 1 log â†’ 2 planks Â· 1 plank â†’ 2 sticks Â· 1 scrap â†’ 4 shards â†’ 16 nails (or 1 scrap â†’ 1 bracket) Â· 2 metal bars â†’ 1 sheet.</p>
+      <p class="builder-footnote">Raw estimate uses component recipes: 1 log → 2 planks · 1 plank → 2 sticks · 1 scrap → 4 shards → 16 nails (or 1 scrap → 1 bracket) · 2 metal bars → 1 sheet.</p>
     </div>`;
 
     const pieceMap = new Map();
@@ -547,17 +546,17 @@
         }
       }
 
-      // sticks from planks: 1 plank â†’ 2 sticks
+      // sticks from planks: 1 plank → 2 sticks
       const planksForSticks = Math.ceil(sticks / 2);
       planks += planksForSticks;
-      // planks from logs: 1 log â†’ 2 planks
+      // planks from logs: 1 log → 2 planks
       logs += Math.ceil(planks / 2);
-      // nails: 1 scrap â†’ 4 shards â†’ 16 nails
+      // nails: 1 scrap → 4 shards → 16 nails
       shards += Math.ceil(nails / 4);
       scrap += Math.ceil(shards / 4);
-      // brackets: 1 scrap â†’ 1 bracket
+      // brackets: 1 scrap → 1 bracket
       scrap += brackets;
-      // sheets: 2 bars â†’ 1 sheet
+      // sheets: 2 bars → 1 sheet
       bars += sheets * 2;
 
       const raw = new Map();
@@ -594,7 +593,7 @@
         .join("");
       const selected = Object.entries(qty)
         .filter(([, n]) => n > 0)
-        .map(([id, n]) => `<span class="mat-chip">${n}Ã— ${link(+id)}</span>`)
+        .map(([id, n]) => `<span class="mat-chip">${n}× ${link(+id)}</span>`)
         .join("");
       box.innerHTML = `<div class="builder-group-title">Materials needed</div>
         <div class="mat-chips">${selected}</div>
@@ -613,7 +612,6 @@
   }
 
   function homePage() {
-
     renderSidebar(null);
     document.title = "H1Emu Loot Database";
     const lootable = DB.items.filter((i) => i.sources).length;
@@ -624,7 +622,7 @@
       .filter(Boolean);
     content.innerHTML = `<div class="home">
       <h1>H1Emu Loot Database</h1>
-      <p class="desc">Searchable item database generated straight from the h1z1-server code and data files â€” damage, fire rates, loot tables, world spawn points, recipes and repair info reflect exactly what the server does.</p>
+      <p class="desc">Searchable item database generated straight from the h1z1-server code and data files — damage, fire rates, loot tables, world spawn points, recipes and repair info reflect exactly what the server does.</p>
       <div class="statrow">
         <div class="stat"><div class="big">${DB.meta.itemCount}</div><div class="lbl">items</div></div>
         <div class="stat"><div class="big">${lootable}</div><div class="lbl">obtainable as loot</div></div>
@@ -639,7 +637,7 @@
             `<a class="itemcard" href="#/item/${i.id}"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(i.cat)}</div></a>`
         )
         .join("")}</div>
-      <div class="note">Data sources: ${Object.values(DB.meta.sources).map(esc).join(" Â· ")}<br>
+      <div class="note">Data sources: ${Object.values(DB.meta.sources).map(esc).join(" · ")}<br>
       Regenerate with <code>npx tsx tools/loot-wiki/extract.ts</code> after changing server data.</div>
     </div>`;
   }
