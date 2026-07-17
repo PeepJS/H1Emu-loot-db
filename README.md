@@ -12,6 +12,8 @@ Or serve locally:
 npx http-server . -p 8080 -c-1
 ```
 
+**Building Calculator** (`#/builder`): pick structure quantities (foundations, walls, shelters, etc.) and get exact craft material totals from Housing recipes, plus a raw-material estimate (logs / scrap / bars).
+
 ## Regenerating the data
 
 `extract.ts` must be run from inside a checkout of [h1z1-server](https://github.com/QuentinGruber/h1z1-server) (it imports server TypeScript and reads `data/2016/...`):

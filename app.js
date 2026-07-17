@@ -106,7 +106,10 @@
   // ------------------------------------------------------------------
   function renderSidebar(activeCat) {
     $("#sidebar").innerHTML =
-      "<h3>Categories</h3>" +
+      `<a class="cat tools${activeCat === "__builder" ? " active" : ""}" href="#/builder">
+        <span>Building Calculator</span>
+      </a>
+      <h3>Categories</h3>` +
       CAT_ORDER.map(
         (c) =>
           `<a class="cat${c === activeCat ? " active" : ""}" href="#/cat/${encodeURIComponent(c)}">
@@ -610,6 +613,262 @@
     window.scrollTo(0, 0);
   }
 
+  // ------------------------------------------------------------------
+  // Building calculator
+  // ------------------------------------------------------------------
+  const BUILDER_GROUPS = [
+    {
+      title: "Foundations",
+      ids: [1378, 2336, 2269, 2270, 124]
+    },
+    {
+      title: "Walls & gates",
+      ids: [149, 1896, 1969, 148]
+    },
+    {
+      title: "Doors",
+      ids: [1881, 1435, 1470]
+    },
+    {
+      title: "Shelters",
+      ids: [150, 153, 1898, 1897]
+    },
+    {
+      title: "Stairs & towers",
+      ids: [154, 1900, 2272]
+    },
+    {
+      title: "Shacks",
+      ids: [1433, 1468]
+    },
+    {
+      title: "Utilities",
+      ids: [64, 1982, 2792, 1891, 3778, 97, 1447]
+    }
+  ];
+
+  // COMPONENT conversion rates from Recipes.ts (for raw-material estimate)
+  const RAW = {
+    WOOD_LOG: 16,
+    WOOD_PLANK: 109,
+    WOOD_STICK: 111,
+    NAIL: 135,
+    METAL_BRACKET: 141,
+    METAL_SHEET: 46,
+    METAL_SCRAP: 48,
+    METAL_BAR: 39,
+    SHARD_METAL: 114
+  };
+
+  const PRESETS = [
+    {
+      name: "1×1 starter deck",
+      qty: { 1378: 1, 149: 3, 1969: 1, 1881: 1, 150: 1 }
+    },
+    {
+      name: "2×2 metal base",
+      qty: {
+        1378: 1,
+        2336: 4,
+        149: 12,
+        1969: 2,
+        1881: 2,
+        150: 4,
+        154: 1
+      }
+    },
+    {
+      name: "Basic shack outpost",
+      qty: { 1468: 1, 1470: 1 }
+    }
+  ];
+
+  function builderPieces() {
+    const out = [];
+    for (const g of BUILDER_GROUPS) {
+      const pieces = [];
+      for (const id of g.ids) {
+        const it = byId.get(id);
+        if (!it || !it.craftedBy || !it.craftedBy[0]) continue;
+        pieces.push({
+          id,
+          name: it.name,
+          components: it.craftedBy[0].components
+        });
+      }
+      if (pieces.length) out.push({ title: g.title, pieces });
+    }
+    return out;
+  }
+
+  function builderPage() {
+    renderSidebar("__builder");
+    document.title = "Building Calculator — H1Emu Loot Database";
+    const groups = builderPieces();
+    const qty = {};
+
+    content.innerHTML = `<div class="home builder">
+      <h1>Building Calculator</h1>
+      <p class="desc">Enter how many of each structure you want. Totals use exact craft costs from <code>Recipes.ts</code> (Housing filter).</p>
+      <div class="builder-presets">
+        <span class="cond">Presets:</span>
+        ${PRESETS.map((p, i) => `<button type="button" class="mapbtn preset" data-p="${i}">${esc(p.name)}</button>`).join("")}
+        <button type="button" class="mapbtn" id="builder-clear">Clear</button>
+      </div>
+      <div class="builder-layout">
+        <div class="builder-pieces" id="builder-pieces">
+          ${groups
+            .map(
+              (g) => `<div class="builder-group">
+              <h2>${esc(g.title)}</h2>
+              ${g.pieces
+                .map(
+                  (p) => `<label class="builder-row">
+                  <span class="nm"><a href="#/item/${p.id}">${esc(p.name)}</a></span>
+                  <input type="number" min="0" step="1" value="0" data-id="${p.id}" />
+                </label>`
+                )
+                .join("")}
+            </div>`
+            )
+            .join("")}
+        </div>
+        <div class="builder-totals card" id="builder-totals">
+          <h2>Materials needed</h2>
+          <div class="note">Add structures to see totals.</div>
+        </div>
+      </div>
+      <div class="note">Raw materials convert via component recipes: 1 log → 2 planks, 1 plank → 2 sticks, 1 scrap → 4 shards → 16 nails (or 1 scrap → 1 bracket), 2 metal bars → 1 sheet (workbench).</div>
+    </div>`;
+
+    const pieceMap = new Map();
+    for (const g of groups) for (const p of g.pieces) pieceMap.set(p.id, p);
+
+    function readQty() {
+      content.querySelectorAll("#builder-pieces input").forEach((inp) => {
+        const n = Math.max(0, parseInt(inp.value, 10) || 0);
+        qty[inp.dataset.id] = n;
+        inp.value = String(n);
+      });
+    }
+
+    function setQty(map) {
+      content.querySelectorAll("#builder-pieces input").forEach((inp) => {
+        const n = map[+inp.dataset.id] || 0;
+        inp.value = String(n);
+        qty[inp.dataset.id] = n;
+      });
+      renderTotals();
+    }
+
+    function craftTotals() {
+      const totals = new Map();
+      for (const [idStr, n] of Object.entries(qty)) {
+        if (!n) continue;
+        const piece = pieceMap.get(+idStr);
+        if (!piece) continue;
+        for (const c of piece.components) {
+          totals.set(c.id, (totals.get(c.id) || 0) + c.amount * n);
+        }
+      }
+      return totals;
+    }
+
+    /** Expand crafted components into harvestable/raw estimates. */
+    function rawTotals(crafted) {
+      let planks = crafted.get(RAW.WOOD_PLANK) || 0;
+      let sticks = crafted.get(RAW.WOOD_STICK) || 0;
+      let nails = crafted.get(RAW.NAIL) || 0;
+      let brackets = crafted.get(RAW.METAL_BRACKET) || 0;
+      let sheets = crafted.get(RAW.METAL_SHEET) || 0;
+      let scrap = crafted.get(RAW.METAL_SCRAP) || 0;
+      let logs = crafted.get(RAW.WOOD_LOG) || 0;
+      let bars = crafted.get(RAW.METAL_BAR) || 0;
+      let shards = crafted.get(RAW.SHARD_METAL) || 0;
+      const other = new Map();
+      for (const [id, n] of crafted) {
+        if (
+          ![
+            RAW.WOOD_PLANK,
+            RAW.WOOD_STICK,
+            RAW.NAIL,
+            RAW.METAL_BRACKET,
+            RAW.METAL_SHEET,
+            RAW.METAL_SCRAP,
+            RAW.WOOD_LOG,
+            RAW.METAL_BAR,
+            RAW.SHARD_METAL
+          ].includes(id)
+        ) {
+          other.set(id, n);
+        }
+      }
+
+      // sticks from planks: 1 plank → 2 sticks
+      const planksForSticks = Math.ceil(sticks / 2);
+      planks += planksForSticks;
+      // planks from logs: 1 log → 2 planks
+      logs += Math.ceil(planks / 2);
+      // nails: 1 scrap → 4 shards → 16 nails
+      shards += Math.ceil(nails / 4);
+      scrap += Math.ceil(shards / 4);
+      // brackets: 1 scrap → 1 bracket
+      scrap += brackets;
+      // sheets: 2 bars → 1 sheet
+      bars += sheets * 2;
+
+      const raw = new Map();
+      if (logs) raw.set(RAW.WOOD_LOG, logs);
+      if (scrap) raw.set(RAW.METAL_SCRAP, scrap);
+      if (bars) raw.set(RAW.METAL_BAR, bars);
+      for (const [id, n] of other) raw.set(id, n);
+      return { raw, intermediates: { planks, sticks, nails, brackets, sheets, shards } };
+    }
+
+    function renderTotals() {
+      readQty();
+      const crafted = craftTotals();
+      const box = $("#builder-totals");
+      if (!crafted.size) {
+        box.innerHTML = `<h2>Materials needed</h2><div class="note">Add structures to see totals.</div>`;
+        return;
+      }
+      const rows = [...crafted.entries()]
+        .sort((a, b) => (byId.get(a[0])?.name || "").localeCompare(byId.get(b[0])?.name || ""))
+        .map(
+          ([id, n]) =>
+            `<tr><td>${link(id)}</td><td class="pct">${n}</td></tr>`
+        )
+        .join("");
+      const { raw } = rawTotals(crafted);
+      const rawRows = [...raw.entries()]
+        .sort((a, b) => (byId.get(a[0])?.name || "").localeCompare(byId.get(b[0])?.name || ""))
+        .map(
+          ([id, n]) =>
+            `<tr><td>${link(id)}</td><td class="pct">${n}</td></tr>`
+        )
+        .join("");
+      const selected = Object.entries(qty)
+        .filter(([, n]) => n > 0)
+        .map(([id, n]) => `${n}× ${link(+id)}`)
+        .join(", ");
+      box.innerHTML = `<h2>Materials needed</h2>
+        <div class="cond" style="margin-bottom:10px">${selected}</div>
+        <h3 class="builder-sub">Craft components</h3>
+        <table class="tbl"><tr><th>Item</th><th>Amount</th></tr>${rows}</table>
+        <h3 class="builder-sub">Raw materials (estimated)</h3>
+        <table class="tbl"><tr><th>Item</th><th>Amount</th></tr>${rawRows}</table>
+        <div class="note">Craft components are what the Housing recipes require. Raw estimate converts planks/nails/brackets/sheets into logs, scrap, and bars.</div>`;
+    }
+
+    content.querySelector("#builder-pieces").addEventListener("input", renderTotals);
+    content.querySelector("#builder-clear").addEventListener("click", () => setQty({}));
+    content.querySelectorAll(".preset").forEach((btn) => {
+      btn.addEventListener("click", () => setQty(PRESETS[+btn.dataset.p].qty));
+    });
+    window.scrollTo(0, 0);
+  }
+
   function homePage() {
     renderSidebar(null);
     document.title = "H1Emu Loot Database";
@@ -628,6 +887,7 @@
         <div class="stat"><div class="big">${craftable}</div><div class="lbl">craftable</div></div>
         <div class="stat"><div class="big">${guns}</div><div class="lbl">guns</div></div>
       </div>
+      <p><a class="mapbtn" href="#/builder" style="display:inline-block;text-decoration:none;padding:8px 14px">Open Building Calculator</a></p>
       <h2 style="font-size:1rem;color:var(--muted)">Try these:</h2>
       <div class="itemlist">${examples
         .map(
@@ -645,6 +905,7 @@
     let m;
     if ((m = h.match(/^#\/item\/(\d+)/))) itemPage(parseInt(m[1]));
     else if ((m = h.match(/^#\/cat\/(.+)/))) catPage(decodeURIComponent(m[1]));
+    else if (h.match(/^#\/builder/)) builderPage();
     else homePage();
   }
   window.addEventListener("hashchange", () => {
