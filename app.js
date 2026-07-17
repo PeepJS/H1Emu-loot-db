@@ -5,13 +5,11 @@
 
   const norm = (s) => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
-  const CAT_ORDER = [
-    "Guns", "Melee", "Ammo", "Medical", "Food & Drink", "Armor",
-    "Clothing", "Materials", "Repair", "Construction", "Containers",
-    "Skins & Unlocks", "Crates & Keys", "Emotes", "Other"
-  ];
   const catCounts = {};
   for (const it of DB.items) catCounts[it.cat] = (catCounts[it.cat] || 0) + 1;
+  const CAT_ORDER = Object.keys(catCounts).sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: "base" })
+  );
 
   const $ = (sel) => document.querySelector(sel);
   const content = $("#content");
@@ -109,7 +107,7 @@
   function renderSidebar(activeCat) {
     $("#sidebar").innerHTML =
       "<h3>Categories</h3>" +
-      CAT_ORDER.filter((c) => catCounts[c]).map(
+      CAT_ORDER.map(
         (c) =>
           `<a class="cat${c === activeCat ? " active" : ""}" href="#/cat/${encodeURIComponent(c)}">
             <span>${esc(c)}</span><span class="n">${catCounts[c]}</span>
