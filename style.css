@@ -137,56 +137,6 @@ table.tbl tr:last-child td { border-bottom: none; }
   padding: 3px 9px; font-size: .84rem;
 }
 
-.spawnmap {
-  margin-top: 18px; padding-top: 14px;
-  border-top: 1px solid var(--border);
-}
-.spawnmap-head {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-.spawnmap-title {
-  font-size: .8rem; text-transform: uppercase; letter-spacing: 1.5px;
-  color: var(--accent); font-weight: 700;
-}
-.spawnmap-hint { color: var(--muted); font-size: .78rem; flex: 1; min-width: 180px; }
-.map-tools { display: flex; gap: 6px; flex-wrap: wrap; }
-.mapbtn, .map-focus {
-  appearance: none; -webkit-appearance: none;
-  background: var(--bg3); color: var(--text); border: 1px solid var(--border);
-  border-radius: 4px; padding: 4px 10px; font-size: .78rem; cursor: pointer;
-  font-family: inherit;
-}
-.mapbtn:hover, .map-focus:hover { border-color: var(--accent); color: var(--accent); }
-.map-focus { padding: 2px 8px; color: var(--accent); }
-#mapwrap { position: relative; max-width: 960px; }
-#map {
-  background: #1a2218; border: 1px solid var(--border); border-radius: 8px;
-  width: 100%; display: block; cursor: grab; touch-action: none;
-  aspect-ratio: 1 / 1;
-}
-#map.dragging { cursor: grabbing; }
-.mapoverlay {
-  display: none; position: absolute; pointer-events: none;
-  background: rgba(15, 18, 24, 0.94); border: 1px solid var(--border);
-  color: var(--text); font-size: .78rem; padding: 5px 9px; border-radius: 4px;
-  white-space: nowrap; z-index: 2; max-width: 90%;
-}
-.maplegend {
-  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
-}
-.maplegend .li {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--bg3); border: 1px solid var(--border);
-  border-radius: 4px; padding: 5px 9px; font-size: .78rem;
-  cursor: pointer; opacity: 1; user-select: none; color: var(--text);
-  font-family: inherit;
-}
-.maplegend .li:hover { border-color: var(--accent); }
-.maplegend .li.off { opacity: .4; }
-.maplegend .li .li-label { font-weight: 600; }
-.maplegend .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-
 .itemlist { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
 .itemcard {
   background: var(--bg2); border: 1px solid var(--border); border-radius: 5px;

@@ -19,7 +19,7 @@
     );
 
   $("#meta").textContent =
-    DB.meta.itemCount + " items · generated " +
+    DB.meta.itemCount + " items Â· generated " +
     new Date(DB.meta.generatedAt).toLocaleDateString();
 
   // ------------------------------------------------------------------
@@ -67,7 +67,7 @@
       .map(
         (it, i) =>
           `<div class="row${i === activeIdx ? " active" : ""}" data-id="${it.id}">
-            <span><span class="nm">${esc(it.name)}</span><span class="cd">#${it.id}${it.code ? " · " + esc(it.code) : ""}</span></span>
+            <span><span class="nm">${esc(it.name)}</span><span class="cd">#${it.id}${it.code ? " Â· " + esc(it.code) : ""}</span></span>
             <span class="badge ${esc(it.cat.split(" ")[0])}">${esc(it.cat)}</span>
           </div>`
       )
@@ -132,7 +132,7 @@
       .filter((p) => p[1] !== undefined && p[1] !== null && p[1] !== "")
       .map((p) => `<span class="k">${p[0]}</span><span class="v">${p[1]}</span>`)
       .join("")}</div>`;
-  const fmtCount = (c) => (c[0] === c[1] ? `${c[0]}` : `${c[0]}–${c[1]}`);
+  const fmtCount = (c) => (c[0] === c[1] ? `${c[0]}` : `${c[0]}â€“${c[1]}`);
   const fmtMs = (ms) => (ms >= 1000 ? (ms / 1000).toFixed(1) + "s" : ms + "ms");
 
   function damageText(w) {
@@ -142,13 +142,13 @@
       const hs = d * w.headshotMultiplier;
       return kv([
         ["Body damage", `${d} <small>(${Math.ceil(HP / d)} shots to kill)</small>`],
-        ["Headshot", `${hs} <small>(×${w.headshotMultiplier}, ${Math.ceil(HP / hs)} to kill)</small>`]
+        ["Headshot", `${hs} <small>(Ã—${w.headshotMultiplier}, ${Math.ceil(HP / hs)} to kill)</small>`]
       ]);
     }
     const hsMax = w.damage.max * w.headshotMultiplier;
     return kv([
-      ["Damage (falloff)", `${w.damage.max} → ${w.damage.min} <small>from ${w.damage.startM}m to ${w.damage.endM}m</small>`],
-      ["Headshot", `up to ${hsMax} <small>(×${w.headshotMultiplier})</small>`]
+      ["Damage (falloff)", `${w.damage.max} â†’ ${w.damage.min} <small>from ${w.damage.startM}m to ${w.damage.endM}m</small>`],
+      ["Headshot", `up to ${hsMax} <small>(Ã—${w.headshotMultiplier})</small>`]
     ]);
   }
 
@@ -159,14 +159,14 @@
     const rows = w.modes
       .map(
         (fm) =>
-          `<tr><td>${fm.rpm} RPM</td><td>${fmtMs(fm.reloadMs)}</td><td>${fm.range}m</td><td>${fm.pellets || "—"}</td></tr>`
+          `<tr><td>${fm.rpm} RPM</td><td>${fmtMs(fm.reloadMs)}</td><td>${fm.range}m</td><td>${fm.pellets || "â€”"}</td></tr>`
       )
       .join("");
     const dps =
       it.weapon.damage.kind === "flat"
         ? Math.round((w.damage.value * m.rpm) / 60)
         : null;
-    return `<div class="card"><h2>Weapon — ${esc(w.defName || "")}</h2>
+    return `<div class="card"><h2>Weapon â€” ${esc(w.defName || "")}</h2>
       ${damageText(w)}
       <div style="height:10px"></div>
       ${kv([
@@ -188,9 +188,9 @@
     return `<div class="card"><h2>Melee</h2>
       ${kv([
         ["Damage / swing", `${d} <small>(${Math.ceil(HP / d)} hits to kill)</small>`],
-        ["Headshot", `${d * it.melee.headshotMultiplier} <small>(×${it.melee.headshotMultiplier})</small>`]
+        ["Headshot", `${d * it.melee.headshotMultiplier} <small>(Ã—${it.melee.headshotMultiplier})</small>`]
       ])}
-      <div class="note">Base melee 1000 × weapon multiplier (abilitiesmanager.ts).</div>
+      <div class="note">Base melee 1000 Ã— weapon multiplier (abilitiesmanager.ts).</div>
     </div>`;
   }
 
@@ -201,7 +201,7 @@
         ["Health", u.heal], ["Bandaging", u.bandaging]
       ].filter((e) => e[1]);
       return `<div class="recipe">
-        <div class="rhead">${esc(u.type.replace(/_/g, " "))}${u.timeout ? " · " + fmtMs(u.timeout) : ""}${u.healType ? " · " + esc(u.healType) : ""}</div>
+        <div class="rhead">${esc(u.type.replace(/_/g, " "))}${u.timeout ? " Â· " + fmtMs(u.timeout) : ""}${u.healType ? " Â· " + esc(u.healType) : ""}</div>
         ${kv(effects.map((e) => [e[0], "+" + e[1]]))}
         ${u.givetrash ? `<div class="cond" style="margin-top:6px">Leaves behind: ${link(u.givetrash)}</div>` : ""}
       </div>`;
@@ -216,8 +216,8 @@
       r.kind === "smelt" ? (r.filter === "COOKING" ? "Campfire / BBQ" : "Furnace") : null
     ].filter(Boolean);
     return `<div class="recipe">
-      <div class="rhead">${r.kind === "smelt" ? "Cook / smelt" : "Craft"}${r.bundle ? ` ×${r.bundle}` : ""} — filter: ${esc(r.filter)}${req.length ? " · requires " + req.join(" + ") : ""}</div>
-      <ul>${r.components.map((c) => `<li>${c.amount}× ${link(c.id)}</li>`).join("")}</ul>
+      <div class="rhead">${r.kind === "smelt" ? "Cook / smelt" : "Craft"}${r.bundle ? ` Ã—${r.bundle}` : ""} â€” filter: ${esc(r.filter)}${req.length ? " Â· requires " + req.join(" + ") : ""}</div>
+      <ul>${r.components.map((c) => `<li>${c.amount}Ã— ${link(c.id)}</li>`).join("")}</ul>
       ${r.leftOver ? `<div class="cond">Left over: ${r.leftOver.map(link).join(", ")}</div>` : ""}
     </div>`;
   }
@@ -252,10 +252,10 @@
       main += ` <span class="cond">of pool</span>`;
     } else if (s.rolls) {
       main += ` <span class="cond">per roll</span>`;
-      extra.push(`${s.rolls[0]}–${s.rolls[1]} rolls`);
+      extra.push(`${s.rolls[0]}â€“${s.rolls[1]} rolls`);
     }
-    if (s.via) extra.push("via " + s.via.join(" → "));
-    return main + (extra.length ? `<div class="cond">${extra.join(" · ")}</div>` : "");
+    if (s.via) extra.push("via " + s.via.join(" â†’ "));
+    return main + (extra.length ? `<div class="cond">${extra.join(" Â· ")}</div>` : "");
   }
 
   function sourceName(s) {
@@ -268,92 +268,24 @@
     return esc(n) + (s.worldCount ? ` <span class="cond">(${s.worldCount} in world)</span>` : "");
   }
 
-  function collectMapGroups(it) {
-    const groups = [];
-    const seen = new Set();
-    for (const s of it.sources || []) {
-      if (s.posKey && !seen.has(s.posKey) && DB.positions[s.posKey]) {
-        seen.add(s.posKey);
-        const label = s.table
-          .replace(/^ItemSpawner_?/, "")
-          .replace(/\.adr$/, "")
-          .replace(/_/g, " ");
-        const count = DB.positions[s.posKey].length / 2;
-        groups.push({
-          key: s.posKey,
-          label,
-          kind: s.kind,
-          pts: DB.positions[s.posKey],
-          count,
-          // Dense world pools drown out useful pins — render as heat and
-          // hide by default when the item also has specific spawn sources.
-          dense: count >= 150
-        });
-      }
-    }
-    const hasFocused = groups.some((g) => !g.dense);
-    for (const g of groups) g.onByDefault = hasFocused ? !g.dense : true;
-    return groups;
-  }
-
   function sourcesCard(it) {
     if (!it.sources) return "";
-    const groups = collectMapGroups(it);
-    const keyToIdx = new Map(groups.map((g, i) => [g.key, i]));
     const rows = it.sources
-      .map((s) => {
-        const gi = s.posKey != null ? keyToIdx.get(s.posKey) : undefined;
-        const mapBtn =
-          gi === undefined
-            ? `<span class="cond">—</span>`
-            : `<button type="button" class="map-focus" data-g="${gi}" title="Show on map">Map</button>`;
-        return `<tr data-g="${gi ?? ""}">
+      .map(
+        (s) => `<tr>
           <td><span class="kindtag ${s.kind}">${s.kind}</span></td>
           <td>${sourceName(s)}</td>
           <td>${chanceText(s)}</td>
           <td>${fmtCount(s.count)}</td>
-          <td class="cond">${(s.conditions || []).join("; ") || "—"}</td>
-          <td>${mapBtn}</td>
-        </tr>`;
-      })
-      .join("");
-    const legend = groups
-      .map(
-        (g, i) =>
-          `<button type="button" class="li${g.onByDefault ? "" : " off"}" data-g="${i}" title="Toggle layer">
-            <span class="dot" style="background:${MAP_COLORS[i % MAP_COLORS.length]}"></span>
-            <span class="li-label">${esc(g.label)}</span>
-            <span class="cond">${g.count}${g.dense ? " · dense" : ""}</span>
-          </button>`
+          <td class="cond">${(s.conditions || []).join("; ") || "â€”"}</td>
+        </tr>`
       )
       .join("");
-    if (groups.length) setTimeout(() => initSpawnMap(groups), 0);
     return `<div class="card wide"><h2>Where to find it</h2>
       <table class="tbl">
-        <tr><th></th><th>Source</th><th>Chance</th><th>Count</th><th>Conditions</th><th></th></tr>${rows}
+        <tr><th></th><th>Source</th><th>Chance</th><th>Count</th><th>Conditions</th></tr>${rows}
       </table>
-      ${
-        groups.length
-          ? `<div class="spawnmap">
-        <div class="spawnmap-head">
-          <span class="spawnmap-title">Spawn map</span>
-          <span class="spawnmap-hint">Drag to pan · scroll to zoom · toggle layers below. Dense world pools start hidden when specific spawns exist.</span>
-          <div class="map-tools">
-            <button type="button" class="mapbtn" id="map-zoom-in" title="Zoom in">+</button>
-            <button type="button" class="mapbtn" id="map-zoom-out" title="Zoom out">−</button>
-            <button type="button" class="mapbtn" id="map-fit">Fit layers</button>
-            <button type="button" class="mapbtn" id="map-world">Full map</button>
-          </div>
-        </div>
-        <div id="mapwrap">
-          <canvas id="map" width="960" height="960"></canvas>
-          <div class="mapoverlay" id="maphover"></div>
-        </div>
-        <div class="maplegend" id="maplegend">${legend}</div>
-      </div>`
-          : ""
-      }
-      <div class="note">Ground sources: each spawn point first rolls its fill chance, then picks one weighted entry from eligible pools. Containers roll N times per restock. Click <em>Map</em> on a row to focus that source. POI regions show on hover.</div>
+      <div class="note">Ground sources: each spawn point first rolls its fill chance, then picks one weighted entry from eligible pools. Containers roll N times per restock.</div>
     </div>`;
   }
 
@@ -367,452 +299,14 @@
   }
 
   // ------------------------------------------------------------------
-  // Spawn map — Z1 topo background + calibrated world→image projection
-  // ------------------------------------------------------------------
-  const MAP_COLORS = ["#d9a743", "#7fb069", "#6a9fd8", "#c65f5f", "#a883d8", "#5fc6b8", "#d8d86a", "#d86ab8"];
-  // Least-squares fit: POI world (x,z) → normalized image (N up, +X east)
-  const MAP_PROJ = {
-    ax: 0.0001230271418719906,
-    bx: 0.4662410759442275,
-    az: -0.0001163959640074316,
-    bz: 0.4332671235306962
-  };
-  let mapAbort = null;
-  let mapImage = null;
-  let mapImageLoading = null;
-
-  function loadMapImage() {
-    if (mapImage) return Promise.resolve(mapImage);
-    if (mapImageLoading) return mapImageLoading;
-    mapImageLoading = new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        mapImage = img;
-        resolve(img);
-      };
-      img.onerror = reject;
-      img.src = "assets/z1-map.png";
-    });
-    return mapImageLoading;
-  }
-
-  function worldToNorm(wx, wz) {
-    return {
-      nx: MAP_PROJ.ax * wx + MAP_PROJ.bx,
-      ny: MAP_PROJ.az * wz + MAP_PROJ.bz
-    };
-  }
-  function normToWorld(nx, ny) {
-    return {
-      x: (nx - MAP_PROJ.bx) / MAP_PROJ.ax,
-      z: (ny - MAP_PROJ.bz) / MAP_PROJ.az
-    };
-  }
-
-  function pointInPoly(x, z, poly) {
-    let inside = false;
-    for (let i = 0, j = poly.length - 2; i < poly.length; i += 2) {
-      const xi = poly[i], zi = poly[i + 1], xj = poly[j], zj = poly[j + 1];
-      if (zi === zj) continue;
-      const intersect =
-        zi > z !== zj > z && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi;
-      if (intersect) inside = !inside;
-      j = i;
-    }
-    return inside;
-  }
-
-  function poiAt(x, z) {
-    for (const poi of DB.pois || []) {
-      for (const b of poi.bounds || []) {
-        if (b.length >= 6 && pointInPoly(x, z, b)) return poi;
-      }
-    }
-    return null;
-  }
-
-  function initSpawnMap(groups) {
-    const canvas = $("#map");
-    if (!canvas) return;
-    if (mapAbort) mapAbort.abort();
-    mapAbort = new AbortController();
-    const { signal } = mapAbort;
-
-    const ctx = canvas.getContext("2d");
-    const off = new Set();
-    groups.forEach((g, i) => {
-      if (!g.onByDefault) off.add(i);
-    });
-
-    let scale = 1;
-    let panX = 0;
-    let panY = 0;
-    let dragging = false;
-    let lastX = 0;
-    let lastY = 0;
-    const hoverEl = $("#maphover");
-
-    // Precompute density grids for dense layers in normalized map space
-    const DENS = 64;
-    for (const g of groups) {
-      if (!g.dense) continue;
-      const grid = new Float32Array(DENS * DENS);
-      let max = 0;
-      for (let p = 0; p < g.pts.length; p += 2) {
-        const { nx, ny } = worldToNorm(g.pts[p], g.pts[p + 1]);
-        const cx = Math.min(DENS - 1, Math.max(0, Math.floor(nx * DENS)));
-        const cy = Math.min(DENS - 1, Math.max(0, Math.floor(ny * DENS)));
-        const idx = cy * DENS + cx;
-        grid[idx] += 1;
-        if (grid[idx] > max) max = grid[idx];
-      }
-      g.heat = grid;
-      g.heatMax = max || 1;
-    }
-
-    const worldToScreen = (wx, wz) => {
-      const { nx, ny } = worldToNorm(wx, wz);
-      return {
-        x: nx * canvas.width * scale + panX,
-        y: ny * canvas.height * scale + panY
-      };
-    };
-    const screenToWorld = (sx, sy) => {
-      const nx = (sx - panX) / (canvas.width * scale);
-      const ny = (sy - panY) / (canvas.height * scale);
-      return normToWorld(nx, ny);
-    };
-
-    function syncLegend() {
-      $("#maplegend")?.querySelectorAll(".li").forEach((el) => {
-        const i = +el.dataset.g;
-        el.classList.toggle("off", off.has(i));
-      });
-    }
-
-    function boundsOf(indices) {
-      let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-      let any = false;
-      for (const i of indices) {
-        const g = groups[i];
-        if (!g) continue;
-        for (let p = 0; p < g.pts.length; p += 2) {
-          any = true;
-          minX = Math.min(minX, g.pts[p]);
-          maxX = Math.max(maxX, g.pts[p]);
-          minZ = Math.min(minZ, g.pts[p + 1]);
-          maxZ = Math.max(maxZ, g.pts[p + 1]);
-        }
-      }
-      return any ? { minX, maxX, minZ, maxZ } : null;
-    }
-
-    function fitBounds(b, pad = 350) {
-      if (!b) {
-        scale = 1;
-        panX = 0;
-        panY = 0;
-        return;
-      }
-      const corners = [
-        worldToNorm(b.minX - pad, b.minZ - pad),
-        worldToNorm(b.minX - pad, b.maxZ + pad),
-        worldToNorm(b.maxX + pad, b.minZ - pad),
-        worldToNorm(b.maxX + pad, b.maxZ + pad)
-      ];
-      let nMinX = Infinity, nMaxX = -Infinity, nMinY = Infinity, nMaxY = -Infinity;
-      for (const c of corners) {
-        nMinX = Math.min(nMinX, c.nx);
-        nMaxX = Math.max(nMaxX, c.nx);
-        nMinY = Math.min(nMinY, c.ny);
-        nMaxY = Math.max(nMaxY, c.ny);
-      }
-      const spanX = Math.max(nMaxX - nMinX, 0.04);
-      const spanY = Math.max(nMaxY - nMinY, 0.04);
-      scale = Math.min(1 / spanX, 1 / spanY, 12);
-      const cx = (nMinX + nMaxX) / 2;
-      const cy = (nMinY + nMaxY) / 2;
-      panX = canvas.width / 2 - cx * canvas.width * scale;
-      panY = canvas.height / 2 - cy * canvas.height * scale;
-    }
-
-    function fitEnabled() {
-      const idx = [];
-      groups.forEach((_, i) => {
-        if (!off.has(i)) idx.push(i);
-      });
-      fitBounds(boundsOf(idx.length ? idx : groups.map((_, i) => i)));
-    }
-
-    function drawPois() {
-      const W = canvas.width, H = canvas.height;
-      ctx.save();
-      ctx.translate(panX, panY);
-      ctx.scale(scale, scale);
-      for (const poi of DB.pois || []) {
-        const military = (poi.tags || []).includes("military") || (poi.tags || []).includes("high_tier");
-        for (const poly of poi.bounds || []) {
-          if (poly.length < 6) continue;
-          ctx.beginPath();
-          for (let i = 0; i < poly.length; i += 2) {
-            const { nx, ny } = worldToNorm(poly[i], poly[i + 1]);
-            const px = nx * W;
-            const py = ny * H;
-            if (i === 0) ctx.moveTo(px, py);
-            else ctx.lineTo(px, py);
-          }
-          ctx.closePath();
-          ctx.fillStyle = military
-            ? "rgba(198, 95, 95, 0.14)"
-            : "rgba(106, 159, 216, 0.1)";
-          ctx.fill();
-          ctx.strokeStyle = military
-            ? "rgba(198, 95, 95, 0.4)"
-            : "rgba(106, 159, 216, 0.32)";
-          ctx.lineWidth = 1.25 / scale;
-          ctx.stroke();
-        }
-      }
-      ctx.restore();
-    }
-
-    function drawHeat(g, color, alpha) {
-      const W = canvas.width, H = canvas.height;
-      const cellW = W / DENS, cellH = H / DENS;
-      ctx.save();
-      ctx.translate(panX, panY);
-      ctx.scale(scale, scale);
-      for (let y = 0; y < DENS; y++) {
-        for (let x = 0; x < DENS; x++) {
-          const v = g.heat[y * DENS + x] / g.heatMax;
-          if (v <= 0) continue;
-          ctx.globalAlpha = alpha * Math.min(1, v * 1.4);
-          ctx.fillStyle = color;
-          ctx.fillRect(x * cellW, y * cellH, cellW + 0.5, cellH + 0.5);
-        }
-      }
-      ctx.restore();
-      ctx.globalAlpha = 1;
-    }
-
-    function draw() {
-      const W = canvas.width, H = canvas.height;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, W, H);
-
-      ctx.fillStyle = "#1a2218";
-      ctx.fillRect(0, 0, W, H);
-
-      ctx.save();
-      ctx.translate(panX, panY);
-      ctx.scale(scale, scale);
-      if (mapImage) {
-        ctx.drawImage(mapImage, 0, 0, W, H);
-        // Slight darken so spawn pins/heat read clearly on the topo
-        ctx.fillStyle = "rgba(8, 12, 10, 0.22)";
-        ctx.fillRect(0, 0, W, H);
-      } else {
-        ctx.fillStyle = "#162018";
-        ctx.fillRect(0, 0, W, H);
-      }
-      ctx.restore();
-
-      drawPois();
-
-      groups.forEach((g, i) => {
-        if (off.has(i)) return;
-        const color = MAP_COLORS[i % MAP_COLORS.length];
-        if (g.dense && g.heat) {
-          drawHeat(g, color, 0.5);
-          return;
-        }
-        ctx.fillStyle = color;
-        ctx.strokeStyle = "rgba(0,0,0,0.45)";
-        ctx.lineWidth = 1;
-        ctx.globalAlpha = 0.95;
-        const r = Math.max(2.4, 3.4 * Math.sqrt(scale));
-        for (let p = 0; p < g.pts.length; p += 2) {
-          const s = worldToScreen(g.pts[p], g.pts[p + 1]);
-          if (s.x < -6 || s.y < -6 || s.x > W + 6 || s.y > H + 6) continue;
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-        }
-      });
-      ctx.globalAlpha = 1;
-
-      ctx.strokeStyle = "#2c3340";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(1, 1, W - 2, H - 2);
-    }
-
-    function focusGroup(i) {
-      // Solo this layer
-      off.clear();
-      groups.forEach((_, j) => {
-        if (j !== i) off.add(j);
-      });
-      syncLegend();
-      fitBounds(boundsOf([i]), 500);
-      draw();
-      $("#mapwrap")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-
-    function zoomAt(factor, cx, cy) {
-      const next = Math.min(10, Math.max(0.5, scale * factor));
-      panX = cx - (cx - panX) * (next / scale);
-      panY = cy - (cy - panY) * (next / scale);
-      scale = next;
-      draw();
-    }
-
-    fitEnabled();
-    syncLegend();
-    draw();
-    loadMapImage()
-      .then(() => {
-        if (!signal.aborted) draw();
-      })
-      .catch(() => {
-        /* keep placeholder bg if image missing */
-      });
-
-    $("#maplegend")?.addEventListener(
-      "click",
-      (ev) => {
-        const li = ev.target.closest(".li");
-        if (!li) return;
-        const i = +li.dataset.g;
-        if (off.has(i)) off.delete(i);
-        else off.add(i);
-        syncLegend();
-        draw();
-      },
-      { signal }
-    );
-
-    content.querySelectorAll(".map-focus").forEach((btn) => {
-      btn.addEventListener("click", (ev) => {
-        ev.preventDefault();
-        focusGroup(+btn.dataset.g);
-      }, { signal });
-    });
-
-    $("#map-fit")?.addEventListener("click", () => { fitEnabled(); draw(); }, { signal });
-    $("#map-world")?.addEventListener(
-      "click",
-      () => { scale = 1; panX = 0; panY = 0; draw(); },
-      { signal }
-    );
-    $("#map-zoom-in")?.addEventListener(
-      "click",
-      () => zoomAt(1.25, canvas.width / 2, canvas.height / 2),
-      { signal }
-    );
-    $("#map-zoom-out")?.addEventListener(
-      "click",
-      () => zoomAt(0.8, canvas.width / 2, canvas.height / 2),
-      { signal }
-    );
-
-    canvas.addEventListener(
-      "wheel",
-      (ev) => {
-        ev.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        const mx = ((ev.clientX - rect.left) / rect.width) * canvas.width;
-        const my = ((ev.clientY - rect.top) / rect.height) * canvas.height;
-        zoomAt(ev.deltaY > 0 ? 0.88 : 1.14, mx, my);
-      },
-      { passive: false, signal }
-    );
-
-    canvas.addEventListener(
-      "mousedown",
-      (ev) => {
-        dragging = true;
-        lastX = ev.clientX;
-        lastY = ev.clientY;
-        canvas.classList.add("dragging");
-      },
-      { signal }
-    );
-    window.addEventListener(
-      "mouseup",
-      () => {
-        dragging = false;
-        canvas.classList.remove("dragging");
-      },
-      { signal }
-    );
-    window.addEventListener(
-      "mousemove",
-      (ev) => {
-        if (!dragging) return;
-        const rect = canvas.getBoundingClientRect();
-        panX += ((ev.clientX - lastX) * canvas.width) / rect.width;
-        panY += ((ev.clientY - lastY) * canvas.height) / rect.height;
-        lastX = ev.clientX;
-        lastY = ev.clientY;
-        draw();
-      },
-      { signal }
-    );
-
-    canvas.addEventListener(
-      "mousemove",
-      (ev) => {
-        if (dragging || !hoverEl) return;
-        const rect = canvas.getBoundingClientRect();
-        const mx = ((ev.clientX - rect.left) / rect.width) * canvas.width;
-        const my = ((ev.clientY - rect.top) / rect.height) * canvas.height;
-        const w = screenToWorld(mx, my);
-        let hit = null;
-        let best = 55 / scale;
-        groups.forEach((g, i) => {
-          if (off.has(i) || g.dense) return;
-          for (let p = 0; p < g.pts.length; p += 2) {
-            const d = Math.hypot(g.pts[p] - w.x, g.pts[p + 1] - w.z);
-            if (d < best) {
-              best = d;
-              hit = { g, x: g.pts[p], z: g.pts[p + 1] };
-            }
-          }
-        });
-        const poi = poiAt(w.x, w.z);
-        if (hit || poi) {
-          hoverEl.style.display = "block";
-          hoverEl.style.left = ev.clientX - rect.left + 14 + "px";
-          hoverEl.style.top = ev.clientY - rect.top + 14 + "px";
-          const bits = [];
-          if (hit) bits.push(`${hit.g.label}  (${hit.x}, ${hit.z})`);
-          if (poi) bits.push(poi.name);
-          hoverEl.textContent = bits.join(" · ");
-        } else {
-          hoverEl.style.display = "none";
-        }
-      },
-      { signal }
-    );
-    canvas.addEventListener(
-      "mouseleave",
-      () => {
-        if (hoverEl) hoverEl.style.display = "none";
-      },
-      { signal }
-    );
-  }
-
-  // ------------------------------------------------------------------
   // Pages
   // ------------------------------------------------------------------
   function itemPage(id) {
-    if (mapAbort) { mapAbort.abort(); mapAbort = null; }
+
     const it = byId.get(id);
     if (!it) { content.innerHTML = `<div class="home"><h1>Item #${id} not found</h1></div>`; return; }
     renderSidebar(it.cat);
-    document.title = it.name + " — H1Emu Loot Database";
+    document.title = it.name + " â€” H1Emu Loot Database";
     const about = kv([
       ["Item ID", it.id],
       ["Class", it.cls ? esc(it.cls) : undefined],
@@ -842,7 +336,7 @@
 
   function catPage(cat) {
     renderSidebar(cat);
-    document.title = cat + " — H1Emu Loot Database";
+    document.title = cat + " â€” H1Emu Loot Database";
     const list = DB.items
       .filter((i) => i.cat === cat)
       .sort((a, b) => (!!b.sources - !!a.sources) || a.name.localeCompare(b.name));
@@ -852,7 +346,7 @@
           (i) =>
             `<a class="itemcard" href="#/item/${i.id}">
               <div class="nm">${esc(i.name)}</div>
-              <div class="sub">#${i.id}${i.sources ? ` · ${i.sources.length} loot source${i.sources.length > 1 ? "s" : ""}` : ""}${i.craftedBy ? " · craftable" : ""}</div>
+              <div class="sub">#${i.id}${i.sources ? ` Â· ${i.sources.length} loot source${i.sources.length > 1 ? "s" : ""}` : ""}${i.craftedBy ? " Â· craftable" : ""}</div>
             </a>`
         )
         .join("")}</div>`;
@@ -908,11 +402,11 @@
 
   const PRESETS = [
     {
-      name: "1×1 starter deck",
+      name: "1Ã—1 starter deck",
       qty: { 1378: 1, 149: 3, 1969: 1, 1881: 1, 150: 1 }
     },
     {
-      name: "2×2 metal base",
+      name: "2Ã—2 metal base",
       qty: {
         1378: 1,
         2336: 4,
@@ -949,7 +443,7 @@
 
   function builderPage() {
     renderSidebar("__builder");
-    document.title = "Building Calculator — H1Emu Loot Database";
+    document.title = "Building Calculator â€” H1Emu Loot Database";
     const groups = builderPieces();
     const qty = {};
 
@@ -987,7 +481,7 @@
           <p class="builder-empty">Add structures to see totals.</p>
         </aside>
       </div>
-      <p class="builder-footnote">Raw estimate uses component recipes: 1 log → 2 planks · 1 plank → 2 sticks · 1 scrap → 4 shards → 16 nails (or 1 scrap → 1 bracket) · 2 metal bars → 1 sheet.</p>
+      <p class="builder-footnote">Raw estimate uses component recipes: 1 log â†’ 2 planks Â· 1 plank â†’ 2 sticks Â· 1 scrap â†’ 4 shards â†’ 16 nails (or 1 scrap â†’ 1 bracket) Â· 2 metal bars â†’ 1 sheet.</p>
     </div>`;
 
     const pieceMap = new Map();
@@ -1053,17 +547,17 @@
         }
       }
 
-      // sticks from planks: 1 plank → 2 sticks
+      // sticks from planks: 1 plank â†’ 2 sticks
       const planksForSticks = Math.ceil(sticks / 2);
       planks += planksForSticks;
-      // planks from logs: 1 log → 2 planks
+      // planks from logs: 1 log â†’ 2 planks
       logs += Math.ceil(planks / 2);
-      // nails: 1 scrap → 4 shards → 16 nails
+      // nails: 1 scrap â†’ 4 shards â†’ 16 nails
       shards += Math.ceil(nails / 4);
       scrap += Math.ceil(shards / 4);
-      // brackets: 1 scrap → 1 bracket
+      // brackets: 1 scrap â†’ 1 bracket
       scrap += brackets;
-      // sheets: 2 bars → 1 sheet
+      // sheets: 2 bars â†’ 1 sheet
       bars += sheets * 2;
 
       const raw = new Map();
@@ -1100,7 +594,7 @@
         .join("");
       const selected = Object.entries(qty)
         .filter(([, n]) => n > 0)
-        .map(([id, n]) => `<span class="mat-chip">${n}× ${link(+id)}</span>`)
+        .map(([id, n]) => `<span class="mat-chip">${n}Ã— ${link(+id)}</span>`)
         .join("");
       box.innerHTML = `<div class="builder-group-title">Materials needed</div>
         <div class="mat-chips">${selected}</div>
@@ -1119,7 +613,7 @@
   }
 
   function homePage() {
-    if (mapAbort) { mapAbort.abort(); mapAbort = null; }
+
     renderSidebar(null);
     document.title = "H1Emu Loot Database";
     const lootable = DB.items.filter((i) => i.sources).length;
@@ -1130,7 +624,7 @@
       .filter(Boolean);
     content.innerHTML = `<div class="home">
       <h1>H1Emu Loot Database</h1>
-      <p class="desc">Searchable item database generated straight from the h1z1-server code and data files — damage, fire rates, loot tables, world spawn points, recipes and repair info reflect exactly what the server does.</p>
+      <p class="desc">Searchable item database generated straight from the h1z1-server code and data files â€” damage, fire rates, loot tables, world spawn points, recipes and repair info reflect exactly what the server does.</p>
       <div class="statrow">
         <div class="stat"><div class="big">${DB.meta.itemCount}</div><div class="lbl">items</div></div>
         <div class="stat"><div class="big">${lootable}</div><div class="lbl">obtainable as loot</div></div>
@@ -1145,7 +639,7 @@
             `<a class="itemcard" href="#/item/${i.id}"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(i.cat)}</div></a>`
         )
         .join("")}</div>
-      <div class="note">Data sources: ${Object.values(DB.meta.sources).map(esc).join(" · ")}<br>
+      <div class="note">Data sources: ${Object.values(DB.meta.sources).map(esc).join(" Â· ")}<br>
       Regenerate with <code>npx tsx tools/loot-wiki/extract.ts</code> after changing server data.</div>
     </div>`;
   }

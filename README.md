@@ -1,6 +1,6 @@
 # H1Emu Loot DB
 
-Interactive Tarkov-style item database for [h1z1-server](https://github.com/QuentinGruber/h1z1-server) / H1Emu. Search any item (e.g. `AR-15`) and see damage, fire rate, ammo, magazine size, loot spawn locations (with a Z1 map), crafting recipes, use effects, durability and repair — extracted from what the server actually does.
+Interactive Tarkov-style item database for [h1z1-server](https://github.com/QuentinGruber/h1z1-server) / H1Emu. Search any item (e.g. `AR-15`) and see damage, fire rate, ammo, magazine size, loot spawn locations, crafting recipes, use effects, durability and repair — extracted from what the server actually does.
 
 ## Usage
 
@@ -36,8 +36,7 @@ Then copy the regenerated files here (or keep this folder as `tools/loot-wiki` i
 | Headshot multipliers | `Character.OnProjectileHit()` (mirrored) |
 | Melee damage | `abilitiesmanager.ts` melee switch (parsed from source) |
 | Loot tables | `data/2016/lootTables/ground` + `containers` |
-| World spawn points | `Z1_items.json` + `Z1_lootableProps.json` |
-| Spawn map POIs | `Z1_POIs.json` |
+| World spawn counts | `Z1_items.json` + `Z1_lootableProps.json` |
 | Zombie drops | `Npc.addZombieLoot()` (mirrored) |
 | Recipes & smelting | `Recipes.ts` |
 | Food/drink/medical effects | `useoptions.ts` |
