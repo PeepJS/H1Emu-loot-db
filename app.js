@@ -707,38 +707,41 @@
     const groups = builderPieces();
     const qty = {};
 
-    content.innerHTML = `<div class="home builder">
-      <h1>Building Calculator</h1>
-      <p class="desc">Enter how many of each structure you want. Totals use exact craft costs from <code>Recipes.ts</code> (Housing filter).</p>
-      <div class="builder-presets">
-        <span class="cond">Presets:</span>
-        ${PRESETS.map((p, i) => `<button type="button" class="mapbtn preset" data-p="${i}">${esc(p.name)}</button>`).join("")}
-        <button type="button" class="mapbtn" id="builder-clear">Clear</button>
-      </div>
+    content.innerHTML = `<div class="builder-page">
+      <header class="builder-hero">
+        <h1>Building Calculator</h1>
+        <p>Set quantities for each structure. Totals use exact Housing craft costs from the server recipes.</p>
+        <div class="builder-presets">
+          ${PRESETS.map((p, i) => `<button type="button" class="preset-btn preset" data-p="${i}">${esc(p.name)}</button>`).join("")}
+          <button type="button" class="preset-btn ghost" id="builder-clear">Clear all</button>
+        </div>
+      </header>
       <div class="builder-layout">
         <div class="builder-pieces" id="builder-pieces">
           ${groups
             .map(
-              (g) => `<div class="builder-group">
-              <h2>${esc(g.title)}</h2>
-              ${g.pieces
-                .map(
-                  (p) => `<label class="builder-row">
-                  <span class="nm"><a href="#/item/${p.id}">${esc(p.name)}</a></span>
-                  <input type="number" min="0" step="1" value="0" data-id="${p.id}" />
-                </label>`
-                )
-                .join("")}
-            </div>`
+              (g) => `<section class="builder-group">
+              <div class="builder-group-title">${esc(g.title)}</div>
+              <div class="builder-rows">
+                ${g.pieces
+                  .map(
+                    (p) => `<div class="builder-row">
+                    <a class="builder-name" href="#/item/${p.id}">${esc(p.name)}</a>
+                    <input class="builder-qty" type="number" min="0" step="1" value="0" data-id="${p.id}" aria-label="Quantity of ${esc(p.name)}" />
+                  </div>`
+                  )
+                  .join("")}
+              </div>
+            </section>`
             )
             .join("")}
         </div>
-        <div class="builder-totals card" id="builder-totals">
-          <h2>Materials needed</h2>
-          <div class="note">Add structures to see totals.</div>
-        </div>
+        <aside class="builder-totals" id="builder-totals">
+          <div class="builder-group-title">Materials needed</div>
+          <p class="builder-empty">Add structures to see totals.</p>
+        </aside>
       </div>
-      <div class="note">Raw materials convert via component recipes: 1 log → 2 planks, 1 plank → 2 sticks, 1 scrap → 4 shards → 16 nails (or 1 scrap → 1 bracket), 2 metal bars → 1 sheet (workbench).</div>
+      <p class="builder-footnote">Raw estimate uses component recipes: 1 log → 2 planks · 1 plank → 2 sticks · 1 scrap → 4 shards → 16 nails (or 1 scrap → 1 bracket) · 2 metal bars → 1 sheet.</p>
     </div>`;
 
     const pieceMap = new Map();
@@ -830,14 +833,15 @@
       const crafted = craftTotals();
       const box = $("#builder-totals");
       if (!crafted.size) {
-        box.innerHTML = `<h2>Materials needed</h2><div class="note">Add structures to see totals.</div>`;
+        box.innerHTML = `<div class="builder-group-title">Materials needed</div>
+          <p class="builder-empty">Add structures to see totals.</p>`;
         return;
       }
       const rows = [...crafted.entries()]
         .sort((a, b) => (byId.get(a[0])?.name || "").localeCompare(byId.get(b[0])?.name || ""))
         .map(
           ([id, n]) =>
-            `<tr><td>${link(id)}</td><td class="pct">${n}</td></tr>`
+            `<div class="mat-row"><span class="mat-name">${link(id)}</span><span class="mat-amt">${n}</span></div>`
         )
         .join("");
       const { raw } = rawTotals(crafted);
@@ -845,20 +849,19 @@
         .sort((a, b) => (byId.get(a[0])?.name || "").localeCompare(byId.get(b[0])?.name || ""))
         .map(
           ([id, n]) =>
-            `<tr><td>${link(id)}</td><td class="pct">${n}</td></tr>`
+            `<div class="mat-row"><span class="mat-name">${link(id)}</span><span class="mat-amt">${n}</span></div>`
         )
         .join("");
       const selected = Object.entries(qty)
         .filter(([, n]) => n > 0)
-        .map(([id, n]) => `${n}× ${link(+id)}`)
-        .join(", ");
-      box.innerHTML = `<h2>Materials needed</h2>
-        <div class="cond" style="margin-bottom:10px">${selected}</div>
-        <h3 class="builder-sub">Craft components</h3>
-        <table class="tbl"><tr><th>Item</th><th>Amount</th></tr>${rows}</table>
-        <h3 class="builder-sub">Raw materials (estimated)</h3>
-        <table class="tbl"><tr><th>Item</th><th>Amount</th></tr>${rawRows}</table>
-        <div class="note">Craft components are what the Housing recipes require. Raw estimate converts planks/nails/brackets/sheets into logs, scrap, and bars.</div>`;
+        .map(([id, n]) => `<span class="mat-chip">${n}× ${link(+id)}</span>`)
+        .join("");
+      box.innerHTML = `<div class="builder-group-title">Materials needed</div>
+        <div class="mat-chips">${selected}</div>
+        <div class="builder-sub">Craft components</div>
+        <div class="mat-list">${rows}</div>
+        <div class="builder-sub">Raw materials (est.)</div>
+        <div class="mat-list">${rawRows}</div>`;
     }
 
     content.querySelector("#builder-pieces").addEventListener("input", renderTotals);
